@@ -12,7 +12,8 @@ attrs==23.2.0
 frozenlist==1.4.1
 multidict==6.0.5
 yarl==1.9.4
-websockets==12.0
+# Let yt-dlp satisfy its own websockets (>=13), or pin explicitly:
+websockets>=13.0
 
 # Audio / media
 ffmpeg-python==0.2.0
