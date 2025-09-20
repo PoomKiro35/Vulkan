@@ -56,6 +56,15 @@ class Downloader:
 
     def __init__(self) -> None:
         self.__config = VConfigs()
+        import os
+sid = os.getenv("SPOTIFY_ID") or getattr(self.__config, "SPOTIFY_ID", None)
+ssec = os.getenv("SPOTIFY_SECRET") or getattr(self.__config, "SPOTIFY_SECRET", None)
+def _mask(v): 
+    return v if not v else f"{v[:3]}…{v[-4:]}"
+print(f"DEVELOPER NOTE -> Spotify ID seen: {_mask(sid)}, Secret seen: {_mask(ssec)}")
+if not sid or not ssec:
+    print("DEVELOPER NOTE -> Spotify credentials not found in config; Spotify-only playback will fail.")
+
         self.__music_keys_only = ['resolution', 'fps', 'quality']
         self.__not_extracted_keys_only = ['ie_key']
         self.__not_extracted_not_keys = ['entries']
