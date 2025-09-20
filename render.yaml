@@ -1,0 +1,13 @@
+services:
+  - type: worker                   # Discord bot should be a worker, not a web service
+    name: vulkan-bot
+    env: python
+    plan: free
+    autoDeploy: true
+    buildCommand: ./render-build.sh
+    startCommand: python main.py
+    envVars:
+      - key: PYTHON_VERSION        # Force Python 3.11 for Pycord stack
+        value: 3.11.9
+      - key: DISCORD_TOKEN         # Leave empty here; set secret in dashboard after first deploy
+        sync: false
