@@ -21,6 +21,7 @@ imageio-ffmpeg==0.4.9
 mutagen==1.47.0
 Brotli==1.1.0
 PyNaCl==1.5.0
+audioop-lts==0.2.1
 
 # Utilities / APIs
 deezer-python==5.3.3
@@ -49,3 +50,4 @@ numpy==1.26.4
 
 # YouTube / download
 yt-dlp==2024.10.22
+
