@@ -1,4 +1,4 @@
-from Config.Exceptions import DeezerError, InvalidInput, SpotifyError, VulkanError, YoutubeError
+from Config.Exceptions import DeezerError, InvalidInput, SpotifyError, VulkanError
 from Music.SpotifySearcher import SpotifySearch
 from Music.DeezerSearcher import DeezerSearcher
 from Utils.UrlAnalyzer import URLAnalyzer
@@ -18,56 +18,49 @@ class Searcher:
     async def search(self, track: str) -> list:
         provider = self.__identify_source(track)
         if provider == Provider.Unknown:
-            raise InvalidInput(self.__messages.UNKNOWN_INPUT, self.__messages.UNKNOWN_INPUT_TITLE)
+            # Nothing we know how to handle
+            raise InvalidInput(self.__messages.UNKNOWN_INPUT,
+                               self.__messages.UNKNOWN_INPUT_TITLE)
 
-        elif provider == Provider.YouTube:
-            try:
-                track = self.__cleanYoutubeInput(track)
-                musics = await self.__down.extract_info(track)
-                return musics
-            except VulkanError as error:
-                raise error
-            except Exception as error:
-                print(f'[Error in Searcher] -> {error}, {type(error)}')
-                raise YoutubeError(self.__messages.YOUTUBE_NOT_FOUND, self.__messages.GENERIC_TITLE)
+        # --- YouTube section removed entirely ---
 
         elif provider == Provider.Spotify:
             try:
                 musics = self.__spotify.search(track)
-                if musics == None or len(musics) == 0:
-                    raise SpotifyError(self.__messages.SPOTIFY_NOT_FOUND, self.__messages.GENERIC_TITLE)
-
+                if not musics:
+                    raise SpotifyError(self.__messages.SPOTIFY_NOT_FOUND,
+                                       self.__messages.GENERIC_TITLE)
                 return musics
             except SpotifyError as error:
-                raise error  # Redirect already processed error
+                raise error
             except Exception as e:
                 print(f'[Spotify Error] -> {e}')
-                raise SpotifyError(self.__messages.SPOTIFY_NOT_FOUND, self.__messages.GENERIC_TITLE)
+                raise SpotifyError(self.__messages.SPOTIFY_NOT_FOUND,
+                                   self.__messages.GENERIC_TITLE)
 
         elif provider == Provider.Deezer:
             try:
                 musics = self.__deezer.search(track)
-                if musics == None or len(musics) == 0:
+                if not musics:
                     raise DeezerError(self.__messages.DEEZER_NOT_FOUND,
                                       self.__messages.GENERIC_TITLE)
-
                 return musics
             except DeezerError as error:
-                raise error  # Redirect already processed error
+                raise error
             except Exception as e:
                 print(f'[Deezer Error] -> {e}')
-                raise DeezerError(self.__messages.DEEZER_NOT_FOUND, self.__messages.GENERIC_TITLE)
+                raise DeezerError(self.__messages.DEEZER_NOT_FOUND,
+                                  self.__messages.GENERIC_TITLE)
 
         elif provider == Provider.Name:
+            # plain text (non-URL) → just return as-is
             return [track]
 
     def __cleanYoutubeInput(self, track: str) -> str:
+        # kept for compatibility but never called
         trackAnalyzer = URLAnalyzer(track)
-        # Just ID and List arguments probably
         if trackAnalyzer.queryParamsQuant <= 2:
             return track
-
-        # Arguments used in Mix Youtube Playlists
         if 'start_radio' or 'index' in trackAnalyzer.queryParams.keys():
             return trackAnalyzer.getCleanedUrl()
 
@@ -78,8 +71,7 @@ class Searcher:
         if not Utils.is_url(track):
             return Provider.Name
 
-        if "https://www.youtu" in track or "https://youtu.be" in track or "https://music.youtube" in track or "m.youtube" in track:
-            return Provider.YouTube
+        # >>> YouTube detection removed so it never returns Provider.YouTube <<<
 
         if "https://open.spotify.com" in track:
             return Provider.Spotify
